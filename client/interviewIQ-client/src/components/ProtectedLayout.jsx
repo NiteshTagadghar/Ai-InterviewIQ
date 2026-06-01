@@ -1,32 +1,19 @@
-import React, { useEffect } from 'react'
-import { Navigate, Outlet, useNavigate } from 'react-router-dom'
+import { Navigate, Outlet } from 'react-router-dom'
 
 function ProtectedLayout() {
 
 
-    // const navigate = useNavigate()
+  const user = localStorage.getItem('user')
 
-    function redirect(){
-        const userCredentials = localStorage.getItem("user")
-        console.log(userCredentials,'user credentials')
-        if(userCredentials){
-            console.log('executing if condition')
+  // navigate("/",{replace : true})
 
-            // navigate('/')
-
-            return <Navigate to="/" />
-        }
-
-    }
+  if(user){
+    return <Navigate to="/" replace />
+  }else{
+    return <Outlet />
+  }
 
 
-    redirect()
-
-  return (
-    <div>
-        <Outlet />
-    </div>
-  )
 }
 
 export default ProtectedLayout

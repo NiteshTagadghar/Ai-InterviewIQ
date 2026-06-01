@@ -3,7 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom'
 
 function AuthProtectedRoute() {
 
-    if(!localStorage.getItem("user")) return <Navigate  to="/login"/>
+    if(!localStorage.getItem("user")) return <Navigate  to="/login" replace/>
   return (
     <div>
         <Outlet />

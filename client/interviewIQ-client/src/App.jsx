@@ -34,35 +34,11 @@ function App() {
   return (
     <>
 
-      <ToastContainer
-      // position="top-right"
-      // autoClose={2000}
-      // hideProgressBar={false}
-      // newestOnTop={false}
-      // closeOnClick={false}
-      // rtl={false}
-      // pauseOnFocusLoss
-      // draggable
-      // pauseOnHover
-      // theme="light"
-      // transition={Bounce}
-      />
+      <ToastContainer />
 
 
 
       <BrowserRouter>
-
-
-
-        <div className="flex h-screen">
-
-          {
-          
-            !hideSidebar  ? null :<div className="w-32 border-1">Sidebar</div>
-          }
-
-          <div>
-
             <Routes>
 
               <Route element={<ProtectedLayout />}>
@@ -77,14 +53,6 @@ function App() {
                 <Route path="/profile" element={<Profile />} />
               </Route>
             </Routes>
-
-
-          </div>
-        </div>
-
-
-
-
       </BrowserRouter>
 
 
