@@ -5,9 +5,9 @@ import axios from 'axios'
 
 function UpdateProfileForm() {
 
-    const {userDetails} = useContext(UserProvider)
+    const {userDetails} = useContext(UserProvider) // {name : "bharat",dob:"",email:"bharat@gmail.com"}
 
-    const [user,setUser] = useState(userDetails)
+    const [user,setUser] = useState(userDetails) // {name : "nitesh",dob:"",email:"bharat@gmail.com"}
 
     function updateForm(value,keyName){
         const newDetails = {...user}
@@ -19,8 +19,20 @@ function UpdateProfileForm() {
 
     async function updateProfile(e){
         e.preventDefault()
+
+        // Compare prev data (userDetails) and new data (user)
+
+        const updatedRecords= {} // {name : "nitesh"}
+
+        for(let key in userDetails){
+            // If userDetails[name] !== user[name] then updatedRecords[name] = user.name
+            if(userDetails[key] !== user[key]) updatedRecords[key] = user.name
+        }
+
         try{
-            const update = await axios.patch(`http://localhost:4000/user/updateProfile`)
+            const update = await axios.patch(`http://localhost:4000/user/updateProfile`,updatedRecords, {
+                headers : {Authorization : `Bearer ${localStorage.getItem('token')}`}
+            })
             console.log(update)
         }catch(err){
             console.log(err.message)
@@ -35,10 +47,10 @@ function UpdateProfileForm() {
                     <label htmlFor="name"> Name </label>
                     <input className='border-1' type="text" required name='name' id='name' value={user.name} onChange={(e)=>updateForm(e.target.value,'name')}   />
                 </div>
-                <div>
+                {/* <div>
                     <label htmlFor="email"> Email </label>
                     <input className='border-1' type="email" name='email' id='email'  required value={user.email} onChange={(e)=>updateForm(e.target.value,'email')}  />
-                </div>
+                </div> */}
                 <div>
                     <label htmlFor="dob"> Dob </label>
                     <input className='border-1' type="date" name='dob' id='dob' value={user.dob} onChange={(e)=>updateForm(e.target.value,'dob')}    />

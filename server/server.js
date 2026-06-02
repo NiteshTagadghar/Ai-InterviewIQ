@@ -35,6 +35,18 @@ app.use("/auth",authRouter)
 app.use("/user",userRouter)
 
 
+ /*
+ req = {}
+
+
+ 10
+
+ middleware -> extract user details from token
+
+ req.user = payload
+ */
+
+
 const port = process.env.PORT
 app.listen(port,()=>{
     console.log(`Server running on port ${port}`)
