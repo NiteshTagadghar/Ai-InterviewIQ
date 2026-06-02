@@ -60,13 +60,13 @@ function Layout() {
     <div className="h-screen flex">
 
       {
-        !isBarHidden && <div className="border-1 w-46">
+        !isBarHidden && <div className="shadow-2xl w-46 ">
           <Sidebar />
 
         </div>
       }
 
-      <div className=" w-full">
+      <div className=" w-full overflow-auto ">
 
         <Outlet />
 

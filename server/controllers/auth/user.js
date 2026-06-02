@@ -73,7 +73,7 @@ export const login = async (req, res) => {
     const userDetails = {
         name: user.name,
         email: user.email,
-        age: user.age || null,
+        dob: user.dob || null,
         phone: user.phone,
     }
 
