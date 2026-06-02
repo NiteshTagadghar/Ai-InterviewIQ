@@ -1,7 +1,9 @@
 import React, { useContext, useState } from 'react'
 import { UserProvider } from './ContextProvider'
 import moment from 'moment'
-import UpdateProfile from './UpdateProfile'
+import PopUp from './PopUp'
+import UpdateProfileForm from './UpdateProfileForm'
+import Login from '../pages/Login'
 
 
 function Profile() {
@@ -25,7 +27,7 @@ function Profile() {
   return (
     <div className='h-screen relative'>
 
-      {isEditEnabled ? <UpdateProfile setIsEditEnabled={setIsEditEnabled} /> : null}
+      {isEditEnabled ? <PopUp setIsEditEnabled={setIsEditEnabled} RenderComponent={UpdateProfileForm} /> : null}
 
       <div className='h-40 mt-10 border-1'>
 
