@@ -78,3 +78,17 @@ function Layout() {
 
 
 export default App
+
+/* 
+
+Step 1 : Create a folder for api, then file for interceptors
+
+Step 2 : Create axios instance using axios.create('baseurl')
+
+Step 3 : Create interceptors for req and res
+
+Step 4 : In req interceptor get token and tag it to headers authorization of api request 
+
+Step 5 : In res interceptor if response is like token expired or invalid token log out user
+
+*/

@@ -25,29 +25,20 @@ mongoose.connect(process.env.DB_URI).then(()=>{
 })
 
 
-
-// app.post("/auth/signup",(req,res)=>{
-//     console.log("api hitting directly")
-// })
-
 app.use("/auth",authRouter)
 
 app.use("/user",userRouter)
-
-
- /*
- req = {}
-
-
- 10
-
- middleware -> extract user details from token
-
- req.user = payload
- */
 
 
 const port = process.env.PORT
 app.listen(port,()=>{
     console.log(`Server running on port ${port}`)
 })
+
+
+/* 
+
+Step 1 : Create a folder for middlewares, then file for authMiddleware (verify jwt token and also check if token in expired)
+
+
+*/
