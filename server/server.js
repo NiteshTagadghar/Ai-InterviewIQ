@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 import cors from 'cors'
 import authRouter from './routes/auth.js'
 import userRouter from './routes/user.js'
+import interviewRouter from './routes/interview.js'
 // import  jsonwebtoken  from 'jsonwebtoken'
 // import cookieParser from 'cookie-parser'
 
@@ -18,16 +19,18 @@ app.use(express.json())
 app.use(cors())
 
 
-mongoose.connect(process.env.DB_URI).then(()=>{
-    console.log(`DB connected`)
-}).catch((err)=>{
-    console.log(err.message)
-})
+// mongoose.connect(process.env.DB_URI).then(()=>{
+//     console.log(`DB connected`)
+// }).catch((err)=>{
+//     console.log(err.message)
+// })
 
 
 app.use("/auth",authRouter)
 
 app.use("/user",userRouter)
+
+app.use("/interview",interviewRouter)
 
 
 const port = process.env.PORT

@@ -1,6 +1,11 @@
 import jwt from 'jsonwebtoken'
 
 export function authMiddleware (req,res,next){
+
+    if(!req.headers.authorization) {
+        return res.status(401).json({message : "Token not provided"})
+    }
+
     const token = req.headers.authorization.split(' ')[1]  // Bearer token
 
     if(!token){
