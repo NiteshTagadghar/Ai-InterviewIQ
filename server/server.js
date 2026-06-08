@@ -7,6 +7,9 @@ import cors from 'cors'
 import authRouter from './routes/auth.js'
 import userRouter from './routes/user.js'
 import interviewRouter from './routes/interview.js'
+import http from 'http'
+import { Server } from 'socket.io'
+import interviewSocket from './sockets/interviewSocket.js'
 // import  jsonwebtoken  from 'jsonwebtoken'
 // import cookieParser from 'cookie-parser'
 
@@ -32,9 +35,28 @@ app.use("/user",userRouter)
 
 app.use("/interview",interviewRouter)
 
+// Create a new server for socket.io
+const server = http.createServer()
+
+// Create instance for socket io by providing server info
+const io = new Server(server,{
+    cors : "*",
+    methods : ["GET","POST"]
+})
+
+// Once connection io established execute callback
+io.on("connection",(socket)=>{
+    console.log(socket.id,'socket id')
+
+    interviewSocket(socket)
+})
+
 
 const port = process.env.PORT
-app.listen(port,()=>{
+
+
+// Change app (express default server) to http created server with socket.io
+server.listen(port,()=>{
     console.log(`Server running on port ${port}`)
 })
 

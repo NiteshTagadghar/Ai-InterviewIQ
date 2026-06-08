@@ -23,31 +23,34 @@ export async function liveInterview(req, res) {
     try {
 
         // OPEN AI
-        // const client = new OpenAI({
-        //     apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
-        // });
+        const client = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
+        });
 
 
         // console.log(body.prompt, 'prompt')
-        // const response = await client.responses.create({
-        //     model: 'gpt-5.5',
-        //     input: body.prompt
-        // });
+        const response = await client.responses.create({
+            model: 'gpt-5.5',
+            input: body.prompt
+        });
 
 
         // GEMINI AI
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: body.prompt,
-        });
+        // const response = await ai.models.generateContent({
+        //     model: 'gemini-2.5-flash',
+        //     contents: body.prompt,
+        // });
 
 
 
 
         console.log(response.text)
 
-        res.status(200).json({ message: "ok", data: response.text })
-        // res.send("working")
+        // Open ai Response
+        res.status(200).json({message : "ok", data : response.output_text})
+
+        // Gemini Response
+        // res.status(200).json({ message: "ok", data: response.text })
 
     } catch (err) {
         console.log(err,'error while calling ai')

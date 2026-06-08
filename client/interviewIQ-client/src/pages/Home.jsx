@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import { api } from '../apis/interceptors'
+import socket from '../interviewSocket'
 
 function Home() {
 
@@ -35,19 +36,50 @@ function Home() {
 
 
   }
+
+
+ 
   
 
 
+  function sendFirstMessage(){
+    socket.emit("first-message", {message : "Lets start interview"})
+  }
+
+   useEffect(()=>{
+    socket.connect()
+
+    socket.on("confirm-interview",(data)=>{
+      console.log(data,'data for confirming interview')
+    });
+
+
+   return ()=>{
+
+    socket.off("confirm-interview")
+
+    socket.disconnect()
+
+    }
+  },[])
+
   return (
     <div className='h-[900px]'>
-      <form className='flex justify-center gap-4 mt-4' onSubmit={callAi} >
+      {/* <form className='flex justify-center gap-4 mt-4' onSubmit={callAi} >
         <textarea type="text" className='w-80 border-1 shadow-2xl' placeholder='Ask ai' onChange={(e)=>setUserText(e.target.value)} />
         <input type="submit" value="Submit" disabled={!userText.length ? true : false}  className={`${!userText.length ? "bg-blue-200" :"bg-blue-400 cursor-pointer"  }   rounded text-white p-2`}  />
 
       </form>
       <div ref={aiContentContainer}>
 
-      </div>
+      </div> */}
+
+
+      <button onClick={sendFirstMessage}>Send first message</button>
+
+      <br />
+
+      <button>Get interview question</button>
     </div>
   )
 }
