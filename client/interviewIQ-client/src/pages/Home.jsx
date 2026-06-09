@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import { api } from '../apis/interceptors'
 import socket from '../interviewSocket'
+import {  startListning, stopListning, textToSpeech } from '../utils/speech'
 
 function Home() {
 
@@ -9,6 +10,7 @@ function Home() {
   const aiResponse = "Okay, here's a well-structured and comprehensive answer for an interview, designed to demonstrate your understanding of Express.js.\n\n---\n\n**Interview Answer:**\n\n\"Express.js is a **fast, minimalist, and unopinionated web application framework for Node.js**. It provides a robust set of features for building web and mobile applications, and is the *de facto* standard for creating powerful and scalable RESTful APIs with Node.js.\n\n**Why is it so popular and widely used?**\n\n1.  **Simplifies Node.js Development:** While Node.js itself is excellent for server-side JavaScript, Express.js abstracts away many low-level details, making it significantly easier and faster to build web applications and APIs.\n2.  **Minimalist & Flexible:** It comes with core functionalities but doesn't impose a rigid structure or design pattern. This 'unopinionated' nature gives developers the freedom to choose their own architecture, database, and templating engine.\n3.  **Powerful Routing:** It provides a robust routing system that allows you to define how your application responds to specific client requests to particular endpoints (URIs) and HTTP methods (GET, POST, PUT, DELETE).\n4.  **Extensive Middleware Ecosystem:** This is one of its most powerful features. Middleware functions have access to the request object (`req`), the response object (`res`), and the `next` middleware function in the application's request-response cycle. They can perform various tasks like parsing request bodies (e.g., `body-parser`), logging, authentication, session management, and error handling, making applications highly modular.\n5.  **Performance & Scalability:** Being built on Node.js, Express inherits its non-blocking I/O model, making it very efficient for handling concurrent requests and building highly performant and scalable applications.\n6.  **Large Community & Resources:** It has a massive and active community, meaning abundant documentation, tutorials, and a vast array of third-party middleware and packages.\n\n**How it fundamentally works:**\n\nAt its core, Express.js functions by listening for incoming HTTP requests. When a request arrives, it passes through a series of **middleware functions** that can process the request, modify it, or respond to it. Finally, a **route handler** matches the request's URL and HTTP method and generates a response, typically sending back JSON data for APIs, rendering an HTML page, or redirecting.\n\n**In summary**, Express.js is an essential tool in the Node.js ecosystem because it provides the necessary structure and tools to efficiently build scalable, high-performance web applications and APIs, while maintaining flexibility and a lightweight footprint.\"\n\n---\n\n**Key takeaways from this answer for an interviewer:**\n\n*   You know the core definition.\n*   You understand *why* it's used (benefits).\n*   You can articulate its two most fundamental concepts: Routing and Middleware.\n*   You can explain the Request/Response cycle implicitly.\n*   You connect it back to Node.js's strengths.\n*   You use appropriate terminology confidently."
 
   const [userText,setUserText] = useState("")
+  const [answer,setAnswer] = useState("")
 
   async function callAi(e){
     e.preventDefault()
@@ -51,6 +53,11 @@ function Home() {
 
     socket.on("confirm-interview",(data)=>{
       console.log(data,'data for confirming interview')
+
+      if(data.message){
+        textToSpeech(data.message)
+      }
+
     });
 
 
@@ -77,9 +84,21 @@ function Home() {
 
       <button onClick={sendFirstMessage}>Send first message</button>
 
+
       <br />
 
       <button>Get interview question</button>
+
+
+      <div>
+        <button onClick={()=>startListning(setAnswer)}>listen</button>
+
+        <br />
+
+        <button onClick={stopListning}>Submit Answer</button>
+      </div>
+
+      <textarea onChange={(e)=>{setAnswer(e.target.value)}}  value={answer}></textarea>
     </div>
   )
 }
