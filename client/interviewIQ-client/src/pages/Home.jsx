@@ -3,6 +3,7 @@ import { toast } from 'react-toastify'
 import { api } from '../apis/interceptors'
 import socket from '../interviewSocket'
 import {  startListning, stopListning, textToSpeech } from '../utils/speech'
+import aiDummy from '../assets/ai-dummy.png'
 
 function Home() {
 
@@ -11,6 +12,9 @@ function Home() {
 
   const [userText,setUserText] = useState("")
   const [answer,setAnswer] = useState("")
+  const [question,setQuestion] = useState("First question")
+  const [userStopped,setUserStopped] = useState(false)
+  const [buttonText,setButtonText] = useState("Start")
 
   async function callAi(e){
     e.preventDefault()
@@ -39,13 +43,21 @@ function Home() {
 
   }
 
-
- 
-  
-
-
   function sendFirstMessage(){
     socket.emit("first-message", {message : "Lets start interview"})
+  }
+
+  function handleStartButton(){
+
+    // On clikc to start, enable mike and listen to answer, change button text to Stop
+    startListning(setAnswer);
+    setButtonText(`Stop`)
+
+    // On click to stop, disable mike and change button text to submit
+
+
+    // On click to submit, answer should be sent to backend (socket) then get a new question and change button text to Start
+    
   }
 
    useEffect(()=>{
@@ -70,8 +82,11 @@ function Home() {
     }
   },[])
 
+  console.log(answer)
+
   return (
-    <div className='h-[900px]'>
+    <div className='h-screen flex justify-center relative'>
+
       {/* <form className='flex justify-center gap-4 mt-4' onSubmit={callAi} >
         <textarea type="text" className='w-80 border-1 shadow-2xl' placeholder='Ask ai' onChange={(e)=>setUserText(e.target.value)} />
         <input type="submit" value="Submit" disabled={!userText.length ? true : false}  className={`${!userText.length ? "bg-blue-200" :"bg-blue-400 cursor-pointer"  }   rounded text-white p-2`}  />
@@ -82,7 +97,7 @@ function Home() {
       </div> */}
 
 
-      <button onClick={sendFirstMessage}>Send first message</button>
+      {/* <button onClick={sendFirstMessage}>Send first message</button>
 
 
       <br />
@@ -96,9 +111,19 @@ function Home() {
         <br />
 
         <button onClick={stopListning}>Submit Answer</button>
+      </div> */}
+
+      <div className='absolute top-20.5'>
+        <img src={aiDummy} alt="Could not load image" className="h-60 rounded-3xl" />
+
+        <h3 className='font-bold text-xl'>{question}</h3>
       </div>
 
-      <textarea onChange={(e)=>{setAnswer(e.target.value)}}  value={answer}></textarea>
+      <div className='absolute top-100.5 flex gap-4'>
+        <textarea onChange={(e) => { setAnswer(e.target.value) }} className='border-1  w-190 rounded shadow-2xl' value={answer}></textarea>
+        <button className='text-white bg-blue-400 w-18 h-10 mt-1 rounded cursor-pointer' onClick={handleStartButton}>{buttonText}</button>
+      </div>
+
     </div>
   )
 }

@@ -64,9 +64,12 @@ function startListning(onTranscript){
             transcript += data.results[i][0].transcript
         }
 
+        // setAnswer/setState(speech converted text)
         onTranscript(transcript)
 
     }
+
+    console.log(recognition,'recognition')
 
 
     // Start listning
