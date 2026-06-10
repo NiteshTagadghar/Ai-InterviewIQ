@@ -1,6 +1,8 @@
 import { toast } from "react-toastify"
 
-function textToSpeech(text){
+// Should update these functions to support all browsers
+
+function textToSpeech(text,setIsAiSpeaking){
 
     if(!text) return toast("Text not provided to speak")
 
@@ -16,6 +18,14 @@ function textToSpeech(text){
     speechSynthesis.cancel()
 
     const utterance = new SpeechSynthesisUtterance(text)
+
+    utterance.onstart = ()=>{
+        setIsAiSpeaking(true)
+    }
+
+    utterance.onend = ()=>{
+        setIsAiSpeaking(false)
+    }
 
     console.log(utterance,'utterance')
 

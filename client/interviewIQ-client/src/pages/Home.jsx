@@ -4,6 +4,7 @@ import { api } from '../apis/interceptors'
 import socket from '../interviewSocket'
 import {  startListning, stopListning, textToSpeech } from '../utils/speech'
 import aiDummy from '../assets/ai-dummy.png'
+import { INTERVIEW_STAGES } from '../constants'
 
 function Home() {
 
@@ -13,8 +14,11 @@ function Home() {
   const [userText,setUserText] = useState("")
   const [answer,setAnswer] = useState("")
   const [question,setQuestion] = useState("First question")
-  const [userStopped,setUserStopped] = useState(false)
   const [buttonText,setButtonText] = useState("Start")
+  const [currentState,setCurrentState] = useState(INTERVIEW_STAGES.DID_NOT_ANSWER_YET)
+  const [buttonColor, setButtonColor] = useState("bg-blue-500")
+  const [isAiSpeaking,setIsAiSpeaking] = useState(false)
+
 
   async function callAi(e){
     e.preventDefault()
@@ -50,14 +54,38 @@ function Home() {
   function handleStartButton(){
 
     // On clikc to start, enable mike and listen to answer, change button text to Stop
-    startListning(setAnswer);
-    setButtonText(`Stop`)
+    if(currentState == INTERVIEW_STAGES.DID_NOT_ANSWER_YET){
+      startListning(setAnswer);
+      setButtonText(`Stop`)
+      setCurrentState(INTERVIEW_STAGES.ANSWERING)
+      setButtonColor("bg-orange-500")
+    }
 
     // On click to stop, disable mike and change button text to submit
-
+    if(currentState == INTERVIEW_STAGES.ANSWERING){
+      stopListning()
+      setButtonText("Submit")
+      setCurrentState(INTERVIEW_STAGES.COMPLETED_ANSWERING)
+      setButtonColor("bg-green-500")
+      
+    }
 
     // On click to submit, answer should be sent to backend (socket) then get a new question and change button text to Start
-    
+    if(currentState == INTERVIEW_STAGES.COMPLETED_ANSWERING){
+      setButtonText("Start")
+
+      setAnswer("")
+
+      setCurrentState(INTERVIEW_STAGES.DID_NOT_ANSWER_YET)
+
+      setButtonColor("bg-blue-500")
+
+      
+      // emit event to socket and get next question and update question state
+    }
+
+
+
   }
 
    useEffect(()=>{
@@ -67,10 +95,12 @@ function Home() {
       console.log(data,'data for confirming interview')
 
       if(data.message){
-        textToSpeech(data.message)
+        textToSpeech(data.message,setIsAiSpeaking)
       }
 
     });
+
+
 
 
    return ()=>{
@@ -82,7 +112,8 @@ function Home() {
     }
   },[])
 
-  console.log(answer)
+  console.log(isAiSpeaking,'is ai speaking')
+
 
   return (
     <div className='h-screen flex justify-center relative'>
@@ -113,15 +144,16 @@ function Home() {
         <button onClick={stopListning}>Submit Answer</button>
       </div> */}
 
+
       <div className='absolute top-20.5'>
-        <img src={aiDummy} alt="Could not load image" className="h-60 rounded-3xl" />
+        <img src={aiDummy} alt="Could not load image" className={`h-60 rounded-3xl ${isAiSpeaking ? "opacity-100" : "opacity-50"}`}  />
 
         <h3 className='font-bold text-xl'>{question}</h3>
       </div>
 
       <div className='absolute top-100.5 flex gap-4'>
-        <textarea onChange={(e) => { setAnswer(e.target.value) }} className='border-1  w-190 rounded shadow-2xl' value={answer}></textarea>
-        <button className='text-white bg-blue-400 w-18 h-10 mt-1 rounded cursor-pointer' onClick={handleStartButton}>{buttonText}</button>
+        <textarea onChange={(e) => { setAnswer(e.target.value) }} className='border-1 border-gray-400  w-190 rounded shadow-2xl' value={answer}></textarea>
+        <button className={`text-white ${buttonColor} w-18 h-10 mt-1 rounded cursor-pointer`} onClick={handleStartButton}>{buttonText}</button>
       </div>
 
     </div>
