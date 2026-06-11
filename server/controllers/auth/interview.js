@@ -61,3 +61,34 @@ export async function liveInterview(req, res) {
 
 
 } 
+
+
+async function askAI({messages}){
+
+
+    const prompt = messages.map((item)=>{
+        return `${item.role} : ${item.content}`
+    })
+
+
+    try{
+
+              // GEMINI AI
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt
+        });
+
+
+        return response.text
+
+    }catch(err){
+        return Promise.reject(err)
+    }
+
+  
+
+
+}
+
+export {askAI}

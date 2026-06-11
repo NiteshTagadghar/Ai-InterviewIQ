@@ -18,6 +18,7 @@ function Home() {
   const [currentState,setCurrentState] = useState(INTERVIEW_STAGES.DID_NOT_ANSWER_YET)
   const [buttonColor, setButtonColor] = useState("bg-blue-500")
   const [isAiSpeaking,setIsAiSpeaking] = useState(false)
+  const [timer,setTimer] = useState(2 * 60)
 
 
   async function callAi(e){
@@ -88,7 +89,23 @@ function Home() {
 
   }
 
+
+
+  function updateTimer(){
+
+ 
+  }
+
+
    useEffect(()=>{
+
+
+         setInterval(() => {
+        setTimer(timer - 1)
+
+      }, 1000)
+
+
     socket.connect()
 
     socket.on("confirm-interview",(data)=>{
@@ -98,9 +115,12 @@ function Home() {
         textToSpeech(data.message,setIsAiSpeaking)
       }
 
+
+
     });
 
 
+// updateTimer()
 
 
    return ()=>{
@@ -110,9 +130,12 @@ function Home() {
     socket.disconnect()
 
     }
+
+
+    
   },[])
 
-  console.log(isAiSpeaking,'is ai speaking')
+  console.log(answer,'is ai speaking')
 
 
   return (
@@ -155,6 +178,8 @@ function Home() {
         <textarea onChange={(e) => { setAnswer(e.target.value) }} className='border-1 border-gray-400  w-190 rounded shadow-2xl' value={answer}></textarea>
         <button className={`text-white ${buttonColor} w-18 h-10 mt-1 rounded cursor-pointer`} onClick={handleStartButton}>{buttonText}</button>
       </div>
+
+      {timer}
 
     </div>
   )
