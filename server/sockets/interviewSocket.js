@@ -3,7 +3,7 @@ import { askAI } from "../controllers/auth/interview.js"
 
 const interviewSessions = new Map()
 
-function interviewSocket(socket){
+function interviewSocket(socket) {
 
     // socket.on("first-message",(data)=>{
     //     console.log("first message recieved", data)
@@ -13,12 +13,12 @@ function interviewSocket(socket){
 
 
     // socket.on("disconnect",(data)=>{
-        
+
     //     console.log("socket connection closed")
     // })
 
 
-     socket.on(
+    socket.on(
         "start-interview",
         async ({
             stack = "MERN",
@@ -146,6 +146,9 @@ Rules:
                 | Save User Answer For Maintaining History Of Conversation
                 ------------------------------------------------------
                 */
+            
+
+                // [{role : "system", content : "You are a senior softwer.."}, {role : "assistant", content : "What is javascript"}, {role : "user", content : "Javascript is a single threaded la..."}]
 
                 session.conversation.push({
 
@@ -234,10 +237,100 @@ Rules:
         "end-interview",
         () => {
 
+
+
+
+
             const session =
                 interviewSessions.get(
                     socket.id
                 )
+
+
+            // {technicalScore : 8, communicationScore : 2, strongAreas : ["react","react-router","react-practical"], weakAreas : ["DSA","JS fundamentals","Constructor function"], roadMap : "Should practice more on DSA part for week 1 ...."}
+
+
+            // Before ending the interview get a feedback, get total score out of 10, get score for communication out of 5 and return an array for strong areas and weak areas also generate a week road map
+            const lastConversation = {
+                role: "stystem",
+                content: "Based on the all the answers give or rate stduent out of 10 technically, and rate student out of 5 based on students  communication. Also return the strong areas where student performed good and week areas where student needs to work on "
+            }
+
+
+
+            const interviewFeedbackPrompt = {
+  
+                systemInstruction: `
+You are a senior technical interviewer. 
+Evaluate the FULL interview transcript provided by the user.
+
+Return ONLY valid JSON — no markdown, no explanation.
+
+Scoring rules:
+- technicalScore: integer 0-10. Base on correctness, depth, React practical, DSA, JS fundamentals.
+- communicationScore: integer 0-5. Base on clarity, structure, English fluency, confidence.
+- strongAreas: array of  strings (skills where candidate was solid)
+- weakAreas: array of strings (skills to improve)
+- roadMap: object with 7 days for week 1, each day is a specific task
+
+JSON schema to follow exactly:
+{
+  "technicalScore": 8,
+  "communicationScore": 2,
+  "strongAreas": ["react", "react-router", "react-practical"],
+  "weakAreas": ["DSA", "JS fundamentals", "Constructor function"],
+  "roadMap": {
+    "day1": "DSA basics - arrays and time complexity",
+    "day2": "JS fundamentals - closures and hoisting",
+    "day3": "Constructor functions vs classes",
+    "day4": "Practice 5 LeetCode easy array problems",
+    "day5": "React practical - build small router app",
+    "day6": "Mock interview - explain code out loud",
+    "day7": "Review weak areas and retake quiz"
+  }
+}
+`,
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    temperature: 0.2
+                }
+            }
+
+            // // usage with Gemini API
+            // const result = await model.generateContent({
+            //   contents: [{
+            //     role: "user",
+            //     parts: [{ text: `INTERVIEW TRANSCRIPT:\n${fullTranscript}` }]
+            //   }],
+            //   systemInstruction: interviewFeedbackPrompt.systemInstruction,
+            //   generationConfig: interviewFeedbackPrompt.generationConfig
+            // });
+
+            // const feedback = JSON.parse(result.response.text());
+
+
+
+
+
+            // Store result in database 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             console.log(
                 "Final Conversation:"
