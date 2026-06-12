@@ -44,22 +44,33 @@ function interviewSocket(socket) {
                         {
                             role: "system",
 
-                            content: `
-You are a Senior Technical Interviewer.
+                            content: `You are a **Senior Technical Interviewer** conducting a real-world technical interview.
 
-Candidate Stack:
-${stack}
+### Candidate Profile
 
-Experience:
-${experience}
+* **Tech Stack:** ${stack}
+* **Experience Level:** ${experience}
 
-Rules:
+### Interview Guidelines
 
-1. Ask only one question.
-2. Ask follow-up questions.
-3. Challenge weak answers, or ask follow up question if answer is not 100% correct
-4. Increase difficulty gradually.
-5. Never provide solutions.
+1. Ask **only one question at a time**.
+2. Always **wait for the candidate’s answer** before proceeding.
+3. Ask **relevant follow-up questions** based on the candidate’s response.
+4. If the answer is:
+
+   * **Incomplete or vague** → probe deeper.
+   * **Partially correct** → challenge assumptions and dig into weak areas.
+   * **Incorrect** → ask guiding questions to uncover gaps (do NOT correct them directly).
+5. Gradually **increase the difficulty level** as the interview progresses.
+6. Focus on **practical understanding, real-world scenarios, and problem-solving ability**, not just theory.
+7. Do **not provide solutions, hints, or explanations** unless explicitly instructed.
+8. Keep the tone **professional, slightly challenging, and realistic**, like a real interviewer.
+
+### Goal
+
+Evaluate the candidate’s **depth of knowledge, clarity of thought, and ability to handle pressure**.
+
+Start with an appropriate question based on the candidate’s experience.
 `
                         }
                     ]
@@ -209,23 +220,23 @@ Rules:
     |
     */
 
-    socket.on(
-        "get-conversation",
-        () => {
+    // socket.on(
+    //     "get-conversation",
+    //     () => {
 
-            const session =
-                interviewSessions.get(
-                    socket.id
-                )
+    //         const session =
+    //             interviewSessions.get(
+    //                 socket.id
+    //             )
 
-            socket.emit(
-                "conversation-data",
+    //         socket.emit(
+    //             "conversation-data",
 
-                session?.conversation ||
-                []
-            )
-        }
-    )
+    //             session?.conversation ||
+    //             []
+    //         )
+    //     }
+    // )
 
     /*
     |--------------------------------------------------------------------------
@@ -235,16 +246,13 @@ Rules:
 
     socket.on(
         "end-interview",
-        () => {
+       async () => {
 
 
 
 
 
-            const session =
-                interviewSessions.get(
-                    socket.id
-                )
+            const session = interviewSessions.get( socket.id )
 
 
             // {technicalScore : 8, communicationScore : 2, strongAreas : ["react","react-router","react-practical"], weakAreas : ["DSA","JS fundamentals","Constructor function"], roadMap : "Should practice more on DSA part for week 1 ...."}
@@ -253,14 +261,7 @@ Rules:
             // Before ending the interview get a feedback, get total score out of 10, get score for communication out of 5 and return an array for strong areas and weak areas also generate a week road map
             const lastConversation = {
                 role: "stystem",
-                content: "Based on the all the answers give or rate stduent out of 10 technically, and rate student out of 5 based on students  communication. Also return the strong areas where student performed good and week areas where student needs to work on "
-            }
-
-
-
-            const interviewFeedbackPrompt = {
-  
-                systemInstruction: `
+                content: ` 
 You are a senior technical interviewer. 
 Evaluate the FULL interview transcript provided by the user.
 
@@ -279,6 +280,7 @@ JSON schema to follow exactly:
   "communicationScore": 2,
   "strongAreas": ["react", "react-router", "react-practical"],
   "weakAreas": ["DSA", "JS fundamentals", "Constructor function"],
+  "feedback" : "You were good with explination part, theory part but should practice more on practical part in question 1 you strugged to create crud operation",
   "roadMap": {
     "day1": "DSA basics - arrays and time complexity",
     "day2": "JS fundamentals - closures and hoisting",
@@ -289,48 +291,30 @@ JSON schema to follow exactly:
     "day7": "Review weak areas and retake quiz"
   }
 }
-`,
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    temperature: 0.2
-                }
+
+return me result in json format 
+`
             }
 
-            // // usage with Gemini API
-            // const result = await model.generateContent({
-            //   contents: [{
-            //     role: "user",
-            //     parts: [{ text: `INTERVIEW TRANSCRIPT:\n${fullTranscript}` }]
-            //   }],
-            //   systemInstruction: interviewFeedbackPrompt.systemInstruction,
-            //   generationConfig: interviewFeedbackPrompt.generationConfig
-            // });
 
-            // const feedback = JSON.parse(result.response.text());
+
+            // Add last conversation into session.conversation
+            session.conversation.push(lastConversation)
 
 
 
+            // Ask ai to get complete feedback in json format
+
+            const feedback = await askAI({message : session.conversation})
 
 
-            // Store result in database 
+            if(feedback){
+                // Call api to store interview details in database
+              await  addInterview(feedback)
+            }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ 
 
             console.log(
                 "Final Conversation:"
@@ -388,6 +372,11 @@ export default interviewSocket
 
 */
 
+
+// Store interview in database
+async function addInterview(){
+
+}
 
 
 
