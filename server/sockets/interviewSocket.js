@@ -376,7 +376,26 @@ export default interviewSocket
 // Store interview in database
 async function addInterview(){
 
+    // Take json from ai verify it with schema
+
+    // Then create a new object and pass all details to it (object should be mathcing with Interview model schema)
+
+    // Tag userId, stack, difficultyLevel, conversation, startedAt and endedAt
+
+    // Once complete object is created for Interview model then add it in database
 }
 
+
+/*
+1. Complete addInterview function
+2. Create api to get interview details from Interview model based on userId
+3. Show interview details in dashboard 
+
+
+Reference for picharts
+
+https://www.npmjs.com/package/react-chartjs-2#docs
+
+*/
 
 
