@@ -36,7 +36,7 @@ function TechnicalScoreChart() {
             {/* <ResponsiveContainer width="100%" aspect={1.618} maxHeight={400}> */}
 
                 <LineChart
-                    style={{ width: '100%', maxWidth: '700px', height: '100%', maxHeight: '70vh', aspectRatio: 1.618 }}
+                    style={{ width: '100%', maxWidth: '30vw', height: '100%', maxHeight: '70vh', aspectRatio: 1.618 }}
                     responsive
                     data={data}
                     margin={{
