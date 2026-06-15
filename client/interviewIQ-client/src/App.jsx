@@ -12,6 +12,7 @@ import { useState } from "react"
 import NewInterview from "./pages/NewInterview"
 import History from "./pages/History"
 import ContextProvider from "./components/ContextProvider"
+import Dashboard from "./pages/Dashboard"
 
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
               <Route element={<AuthProtectedRoute />}>
                 <Route path="*" element={<FallbackComponent />} />
                 <Route path="/" element={<Home />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/new-interview" element={<NewInterview />} />
                 <Route path="/history" element={<History />} />
