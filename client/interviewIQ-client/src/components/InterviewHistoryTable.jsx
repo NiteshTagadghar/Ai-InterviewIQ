@@ -2,7 +2,16 @@ import React from 'react'
 
 function InterviewHistoryTable() {
   return (
-    <div>InterviewHistoryTable</div>
+    <div>
+        Sq.no
+        Stack
+        Difficulty level
+        Date
+        Technical Score
+        Communication Score
+        Duration
+        Redirection button
+    </div>
   )
 }
 
