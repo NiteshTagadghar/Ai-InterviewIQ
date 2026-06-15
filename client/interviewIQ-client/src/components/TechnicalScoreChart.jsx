@@ -55,7 +55,7 @@ function TechnicalScoreChart() {
 
                     />
 
-                    <Tooltip />
+                    <Tooltip formatter={(value)=>[`${value}/10`]} />
                     <Legend  />
                     <Line
                         type="monotone"
