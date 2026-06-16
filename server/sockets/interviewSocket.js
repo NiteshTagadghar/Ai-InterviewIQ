@@ -1,9 +1,11 @@
-import { askAI } from "../controllers/auth/interview.js"
+import { askAI, getFeedbackFromAI } from "../controllers/auth/interview.js"
+import { endInterviewSystemPrompt, startInterviewSystempPrompt } from "../utils/prompts.js"
 
 
 const interviewSessions = new Map()
 
 function interviewSocket(socket) {
+    const userId = socket.userId
 
     // socket.on("first-message",(data)=>{
     //     console.log("first message recieved", data)
@@ -22,7 +24,8 @@ function interviewSocket(socket) {
         "start-interview",
         async ({
             stack = "MERN",
-            experience = "Fresher"
+            difficultyLevel = "Fresher",
+            
         }) => {
 
             try {
@@ -34,53 +37,22 @@ function interviewSocket(socket) {
                 */
 
                 const session = {
-
+                    userId,
                     stack,
-
-                    experience,
-
+                    difficultyLevel,
+                    startedAt : new Date(),
                     conversation: [
 
                         {
                             role: "system",
 
-                            content: `You are a **Senior Technical Interviewer** conducting a real-world technical interview.
-
-### Candidate Profile
-
-* **Tech Stack:** ${stack}
-* **Experience Level:** ${experience}
-
-### Interview Guidelines
-
-1. Ask **only one question at a time**.
-2. Always **wait for the candidate’s answer** before proceeding.
-3. Ask **relevant follow-up questions** based on the candidate’s response.
-4. If the answer is:
-
-   * **Incomplete or vague** → probe deeper.
-   * **Partially correct** → challenge assumptions and dig into weak areas.
-   * **Incorrect** → ask guiding questions to uncover gaps (do NOT correct them directly).
-5. Gradually **increase the difficulty level** as the interview progresses.
-6. Focus on **practical understanding, real-world scenarios, and problem-solving ability**, not just theory.
-7. Do **not provide solutions, hints, or explanations** unless explicitly instructed.
-8. Keep the tone **professional, slightly challenging, and realistic**, like a real interviewer.
-
-### Goal
-
-Evaluate the candidate’s **depth of knowledge, clarity of thought, and ability to handle pressure**.
-
-Start with an appropriate question based on the candidate’s experience.
-`
+                            content: startInterviewSystempPrompt(stack,difficultyLevel)
                         }
                     ]
                 }
 
                 // Store conversation with socket id (to identify unique clients sockets)
-                interviewSessions.set(
-                    socket.id,
-                    session
-                )
+                interviewSessions.set( socket.id, session )
 
                 /*
                 ------------------------------------------------------
@@ -88,12 +60,7 @@ Start with an appropriate question based on the candidate’s experience.
                 ------------------------------------------------------
                 */
 
-                const firstQuestion =
-                    await askAI({
-
-                        messages:
-                            session.conversation
-                    })
+                const firstQuestion =  await askAI({  messages:  session.conversation  })
 
                 /*
                 ------------------------------------------------------
@@ -105,8 +72,7 @@ Start with an appropriate question based on the candidate’s experience.
 
                     role: "assistant",
 
-                    content:
-                        firstQuestion
+                    content: firstQuestion
                 })
 
                 socket.emit(
@@ -144,13 +110,9 @@ Start with an appropriate question based on the candidate’s experience.
 
             try {
 
-                const session =
-                    interviewSessions.get(
-                        socket.id
-                    )
+                const session = interviewSessions.get( socket.id )
 
-                if (!session)
-                    return
+                if (!session)  return
 
                 /*
                 ------------------------------------------------------
@@ -165,8 +127,7 @@ Start with an appropriate question based on the candidate’s experience.
 
                     role: "user",
 
-                    content:
-                        answer
+                    content:  answer
                 })
 
                 /*
@@ -178,8 +139,7 @@ Start with an appropriate question based on the candidate’s experience.
                 const nextQuestion =
                     await askAI({
 
-                        messages:
-                            session.conversation
+                        messages: session.conversation
                     })
 
                 /*
@@ -192,8 +152,7 @@ Start with an appropriate question based on the candidate’s experience.
 
                     role: "assistant",
 
-                    content:
-                        nextQuestion
+                    content: nextQuestion
                 })
 
                 socket.emit(
@@ -248,11 +207,9 @@ Start with an appropriate question based on the candidate’s experience.
         "end-interview",
        async () => {
 
-
-
-
-
             const session = interviewSessions.get( socket.id )
+
+            // Add check if not session is found
 
 
             // {technicalScore : 8, communicationScore : 2, strongAreas : ["react","react-router","react-practical"], weakAreas : ["DSA","JS fundamentals","Constructor function"], roadMap : "Should practice more on DSA part for week 1 ...."}
@@ -261,40 +218,11 @@ Start with an appropriate question based on the candidate’s experience.
             // Before ending the interview get a feedback, get total score out of 10, get score for communication out of 5 and return an array for strong areas and weak areas also generate a week road map
             const lastConversation = {
                 role: "stystem",
-                content: ` 
-You are a senior technical interviewer. 
-Evaluate the FULL interview transcript provided by the user.
-
-Return ONLY valid JSON — no markdown, no explanation.
-
-Scoring rules:
-- technicalScore: integer 0-10. Base on correctness, depth, React practical, DSA, JS fundamentals.
-- communicationScore: integer 0-5. Base on clarity, structure, English fluency, confidence.
-- strongAreas: array of  strings (skills where candidate was solid)
-- weakAreas: array of strings (skills to improve)
-- roadMap: object with 7 days for week 1, each day is a specific task
-
-JSON schema to follow exactly:
-{
-  "technicalScore": 8,
-  "communicationScore": 2,
-  "strongAreas": ["react", "react-router", "react-practical"],
-  "weakAreas": ["DSA", "JS fundamentals", "Constructor function"],
-  "feedback" : "You were good with explination part, theory part but should practice more on practical part in question 1 you strugged to create crud operation",
-  "roadMap": {
-    "day1": "DSA basics - arrays and time complexity",
-    "day2": "JS fundamentals - closures and hoisting",
-    "day3": "Constructor functions vs classes",
-    "day4": "Practice 5 LeetCode easy array problems",
-    "day5": "React practical - build small router app",
-    "day6": "Mock interview - explain code out loud",
-    "day7": "Review weak areas and retake quiz"
-  }
-}
-
-return me result in json format 
-`
+                content: endInterviewSystemPrompt()
             }
+
+
+            session.endedAt = new Date()
 
 
 
@@ -305,24 +233,14 @@ return me result in json format
 
             // Ask ai to get complete feedback in json format
 
-            const feedback = await askAI({message : session.conversation})
+            const feedback = await getFeedbackFromAI({message : session.conversation})
 
 
             if(feedback){
-                // Call api to store interview details in database
+                // Store interview details in database
               await  addInterview(feedback)
             }
 
-
- 
-
-            console.log(
-                "Final Conversation:"
-            )
-
-            console.log(
-                session?.conversation
-            )
 
             interviewSessions.delete(
                 socket.id
@@ -364,7 +282,7 @@ export default interviewSocket
 
  Complete the flow for converstion between user and ai for interview
 
- 1. Create a prompt to send to ai for the first time where you will define user stack, user experience and the difficulty level
+ 1. Create a prompt to send to ai for the first time where you will define user stack, user difficultyLevel and the difficulty level
  2. Create a map to store all socket ids and mapped with conversation (to pass it to next question as context)
  3. Create a commong function called askAI and pass complete conversation as history so that we can get follow up question
  4. Create an event to start interview, submit answer, end interview
@@ -375,6 +293,9 @@ export default interviewSocket
 
 // Store interview in database
 async function addInterview(){
+
+
+    
 
     // Take json from ai verify it with schema
 
