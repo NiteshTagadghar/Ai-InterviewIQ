@@ -92,6 +92,7 @@ server.listen(port,()=>{
 })
 
 
+
 /* 
 
 Step 1 : Create a folder for middlewares, then file for authMiddleware (verify jwt token and also check if token in expired)

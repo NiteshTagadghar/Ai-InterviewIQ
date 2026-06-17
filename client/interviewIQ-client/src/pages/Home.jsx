@@ -18,7 +18,8 @@ function Home() {
   const [currentState,setCurrentState] = useState(INTERVIEW_STAGES.DID_NOT_ANSWER_YET)
   const [buttonColor, setButtonColor] = useState("bg-blue-500")
   const [isAiSpeaking,setIsAiSpeaking] = useState(false)
-  const [timer,setTimer] = useState(2 * 60)
+  const [timer,setTimer] = useState( 65)
+  const [isLastMinute,setIsLastMinute] = useState(false)
 
 
   async function callAi(e){
@@ -100,11 +101,6 @@ function Home() {
    useEffect(()=>{
 
 
-         setInterval(() => {
-        setTimer(timer - 1)
-
-      }, 1000)
-
 
     socket.connect()
 
@@ -118,6 +114,9 @@ function Home() {
 
 
     });
+
+
+    // Listen to event speak-feedback
 
 
 // updateTimer()
@@ -135,7 +134,43 @@ function Home() {
     
   },[])
 
-  console.log(answer,'is ai speaking')
+
+
+  // Count down timer
+  useEffect(()=>{
+   
+    const interval = setInterval(() => {
+      console.log("executing interval")
+
+
+
+      setTimer((prev) => {
+
+
+        if (prev == 60) {
+          setIsLastMinute(true)
+          socket.emit('end-interview')
+        }
+
+        if (prev <= 0) {
+          clearInterval(interval)
+          return 0
+        } else {
+          return prev - 1
+        }
+      })
+    }, 1000)
+
+
+    return ()=>{
+      clearInterval(interval)
+    }
+
+
+
+  },[])
+
+  console.log(timer,isLastMinute,'timer')
 
 
   return (
@@ -179,7 +214,9 @@ function Home() {
         <button className={`text-white ${buttonColor} w-18 h-10 mt-1 rounded cursor-pointer`} onClick={handleStartButton}>{buttonText}</button>
       </div>
 
-      {timer}
+        <p className={`${isLastMinute ? "text-red-500 " : "text-black"} font-bold text-2xl`}>
+          {timer}
+        </p>
 
     </div>
   )
@@ -197,5 +234,16 @@ export default Home
  6. User can have one more button whcih says No-Answer in red color 
  7. Once user gives answer then there should be a button saying submit answer
  
+ 
+ */
+
+
+
+
+ /*
+ 
+ 1. Once last minute is remaining, emit event end-interview from frontend
+ 2. Once interview feedback is updated in backend, backend will emit one event called "speak-feedback"
+ 3. Frontend should listen to event "speak-feedback" and take feedback from backend and call function textToSpeech 
  
  */

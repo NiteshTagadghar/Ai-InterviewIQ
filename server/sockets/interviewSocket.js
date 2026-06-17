@@ -206,10 +206,14 @@ function interviewSocket(socket) {
     socket.on(
         "end-interview",
        async () => {
+        console.log("ending interview")
 
             const session = interviewSessions.get( socket.id )
 
             // Add check if not session is found
+            if(!session){
+                return
+            }
 
 
             // {technicalScore : 8, communicationScore : 2, strongAreas : ["react","react-router","react-practical"], weakAreas : ["DSA","JS fundamentals","Constructor function"], roadMap : "Should practice more on DSA part for week 1 ...."}
@@ -240,6 +244,8 @@ function interviewSocket(socket) {
                 // Store interview details in database
               await  addInterview(feedback)
             }
+
+            // Emit event speak-feedback and send feedback in text format
 
 
             interviewSessions.delete(
@@ -295,7 +301,7 @@ export default interviewSocket
 async function addInterview(){
 
 
-    
+
 
     // Take json from ai verify it with schema
 
