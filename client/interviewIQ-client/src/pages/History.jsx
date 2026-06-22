@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Reducer from '../components/Reducer'
 import { useDispatch, useSelector } from 'react-redux'
 import { customTwenty, decrement, increment } from '../features/counter/counterSlice'
+import { fetchUsers } from '../features/users/userSlice'
 
 function History() {
 
@@ -12,9 +13,23 @@ function History() {
   )
 
 
+  const {isLoading,users,err} = useSelector((state) =>{
+
+    console.log(state,'state in useSelector for users')
+    return state.users
+  })
+
   const dispatch = useDispatch()
 
-  console.log(count, 'count')
+
+
+  useEffect(()=>{
+    dispatch(fetchUsers())
+  },[])
+
+  // console.log(count, 'count')
+
+  console.log(isLoading,users,err,'users state from store')
   return (
     <div>
       RTK
